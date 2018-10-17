@@ -5,7 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Editor } from 'slate-react';
 
-import PluginEditList from '../lib/';
+import PluginEditList from '../lib';
 
 import INITIAL_VALUE from './value';
 
@@ -45,8 +45,16 @@ function renderNode(props: *) {
 }
 
 class Example extends React.Component<*, *> {
+    editor: React.Node<typeof Editor>;
+
     state = {
         value: INITIAL_VALUE
+    };
+
+    ref = (editor: ?React.Node<typeof Editor>) => {
+        if (editor) {
+            this.editor = editor;
+        }
     };
 
     renderToolbar() {
@@ -94,9 +102,7 @@ class Example extends React.Component<*, *> {
     }
 
     call(change) {
-        this.setState({
-            value: this.state.value.change().call(change).value
-        });
+        return this.editor.change(change);
     }
 
     onChange = ({ value }) => {
@@ -110,6 +116,7 @@ class Example extends React.Component<*, *> {
             <div>
                 {this.renderToolbar()}
                 <Editor
+                    ref={this.ref}
                     placeholder="Enter some text..."
                     plugins={plugins}
                     value={this.state.value}
